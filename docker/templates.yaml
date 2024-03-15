@@ -1,0 +1,37 @@
+version: "3.5"
+
+x-docker-env-override: &override-env-vars
+  TEMPORAL_HOST: temporal
+  POSTGRES_HOST: host.docker.internal
+  REDIS_HOST: redis
+
+services:
+  webapp:
+    profiles: ['web']
+    build:
+      context: ../
+    depends_on:
+      - "temporal"
+    restart: always
+    networks:
+      - ea-network
+    env_file:
+      - ../.env
+      - ../.env.local
+    environment:
+      <<: *override-env-vars
+
+  worker:
+    profiles: ['worker']
+    build:
+      context: ../
+    depends_on:
+      - "temporal"
+    restart: always
+    networks:
+      - ea-network
+    env_file:
+      - ../.env
+      - ../.env.local
+    environment:
+      <<: *override-env-vars
